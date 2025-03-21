@@ -6,38 +6,50 @@ public class Chord {
     String rootNote;
     String thirdNote;
     String fifthNote;
+    String chordType; //added
     
     //constructor
     public Chord(String rootNote, String thirdNote, String fifthNote){
         this.rootNote = rootNote;
         this.thirdNote = thirdNote;
         this.fifthNote = fifthNote;
+        this.chordType = determineChordType(); //added
     }
 
     //we should change this to just return the chord name
     //but for the moment i have it return the notes for debugging
     @Override
-    public String toString(){
-        return rootNote + " " + thirdNote + " " + fifthNote;
+    p public String toString(){
+        return isValidChord() ? rootNote + " " + chordType : rootNote + " unknown"; //updated
     }
 
-    //checks if the chord is a real chord
-    public boolean isValidChord(){
-        //gets distance in semi-tones for the 3 notes
-        int distanceFromRootToThird = (getTone(this.thirdNote) - getTone(this.rootNote) + 12) % 12;
-        int distanceFromThirdToFifth = (getTone(this.fifthNote) - getTone(this.thirdNote) + 12) % 12;
-        
-        //all cases where a real chord exists
-        return (distanceFromRootToThird == 4 && distanceFromThirdToFifth == 3) || // Major 
-               (distanceFromRootToThird == 3 && distanceFromThirdToFifth == 4) || // Minor 
-               (distanceFromRootToThird == 3 && distanceFromThirdToFifth == 3) || // Diminished
-               (distanceFromRootToThird == 4 && distanceFromThirdToFifth == 4);   // Augmented
+    public boolean isValidChord() { //added
+    	return chordType != null;
     }
-
-
-
     
+    private String determineChordType() { //updated
+        int rootToThird = getInterval(rootNote, thirdNote);
+        int thirdToFifth = getInterval(thirdNote, fifthNote);
 
+        if (rootToThird == 4 && thirdToFifth == 3) return "maj";
+        if (rootToThird == 3 && thirdToFifth == 4) return "min";
+        if (rootToThird == 3 && thirdToFifth == 3) return "dim";
+        if (rootToThird == 4 && thirdToFifth == 4) return "aug";
+
+        return null;
+    }
+    
+    private int getInterval(String from, String to) {
+        int fromTone = getTone(from);
+        int toTone = getTone(to);
+        if (fromTone == -1 || toTone == -1) return -1;
+        return (toTone - fromTone + 12) % 12;
+    }
+
+    // Public helper for ChordFinder to validate notes
+    public static boolean isValidNote(String note) {
+        return noteToToneMap.containsKey(note);
+    }
 
     //the following is a method and a map to get the tone of each note
     //this probally should be put in its own class but im lazy so im hiding it at the bottom
