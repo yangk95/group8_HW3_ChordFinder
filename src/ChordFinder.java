@@ -5,6 +5,36 @@ import java.util.Set;
 
 public class ChordFinder{
 
+    //this takes space-separated notes, returns Set<String> of chord names
+    public Set<String> getChordName(String chordInput) {
+        if (chordInput == null) {
+            throw new IllegalArgumentException("Input cannot be null.");
+        }
+
+        String[] notes = chordInput.trim().split("\\s+");
+        if (notes.length != 3) {
+            throw new IllegalArgumentException("Input must contain exactly three notes.");
+        }
+
+        //checks each note
+        for (String note : notes) {
+            if (!Chord.isValidNote(note)) {
+                throw new IllegalArgumentException("Invalid note: " + note);
+            }
+        }
+
+        Set<Chord> validChords = getAllChords(notes[0], notes[1], notes[2]);
+        Set<String> chordNames = new HashSet<>();
+
+        for (Chord chord : validChords) {
+            chordNames.add(chord.toString()); //this assumes toString() returns "C min", "G maj", etc.
+        }
+
+        return chordNames;
+    }
+
+    
+
     //this returns a set of all valid chords from 3 notes
     public Set<Chord> getAllChords(String firstNote, String secondNote, String thirdNote){
         Set<Chord> returnSet = new HashSet<>();
